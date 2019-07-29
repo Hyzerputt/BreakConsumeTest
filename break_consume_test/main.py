@@ -34,6 +34,7 @@ def main():
     logger.info("Staring Consume")
     consumer.listen(callback=consumer_call_back)
     logger.info("Consume was stopped")
+    consumer.disconnect()
 
 if __name__ == "__main__":
     main()
