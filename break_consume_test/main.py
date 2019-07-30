@@ -43,11 +43,15 @@ def bounded_consume():
 
     messages = consumer.consume(inactivity_timeout=30)
     logger.debug("Start message processing")
+    methods = []
     for method, properties, body in messages:
         logger.debug(f"Processing message {body}")
+        methods.append(method)
         if body is None:
             logger.debug("Finish message processing")
             break
+
+    map(consumer.channel.basic_reject, methods)
 
 
     logger.info("Bounded Consume finished")
