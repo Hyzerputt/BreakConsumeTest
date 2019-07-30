@@ -99,7 +99,7 @@ class BaseConnector:
         self.channel = self.connection.channel()
         logger.info("Channel Created")
         self.channel.confirm_delivery()  # ensure persistence prior to message confirmation
-        self.channel.basic_qos(prefetch_count=1)  # only 1 un-Acked message delivered at a time
+        self.channel.basic_qos(prefetch_count=100)  # only 1 un-Acked message delivered at a time TODO change back to 1.
         logger.info("Channel configured")
 
     def connect(self):
@@ -180,6 +180,14 @@ class ConsumerConnector(BaseConnector):
         logger.info(f"Starting Listener on Queue: {self.consumer_queue}")
         self.channel.basic_consume(queue=self.consumer_queue, on_message_callback=callback)
         self.channel.start_consuming()
+
+
+    def consume(self, inactivity_timeout):
+        """
+        Test of consume method
+        :return: generator
+        """
+        return self.channel.consume(queue=self.consumer_queue, inactivity_timeout=inactivity_timeout)
 
 
 

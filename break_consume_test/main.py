@@ -27,14 +27,32 @@ def consumer_call_back(ch, method, properties, body):
 
 
 @logger.catch()
-def main():
-    logger.info("Starting Main")
+def perpetual_consume():
     consumer.connect()
     logger.info(f"Connected to RabbitMQ on {consumer.connection_parameters}")
-    logger.info("Staring Consume")
+    logger.info("Staring Perepetual Consume")
     consumer.listen(callback=consumer_call_back)
-    logger.info("Consume was stopped")
+    logger.info("Perpetual Consume was stopped")
+    consumer.disconnect()
+
+@logger.catch()
+def bounded_consume():
+    consumer.connect()
+    logger.info(f"Connected to RabbitMQ on {consumer.connection_parameters}")
+    logger.info("Staring Bounded Consume")
+
+    messages = consumer.consume(inactivity_timeout=30)
+    logger.debug("Start message processing")
+    for method, properties, body in messages:
+        logger.debug(f"Processing message {body}")
+        if body is None:
+            logger.debug("Finish message processing")
+            break
+
+
+    logger.info("Bounded Consume finished")
     consumer.disconnect()
 
 if __name__ == "__main__":
-    main()
+    #perpetual_consume()
+    bounded_consume()
